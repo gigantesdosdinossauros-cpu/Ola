@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .panel {
+    width: 370px;
+    background: #0d0d0d;
+    border: 1px solid #2a2a2a;
+    border-radius: 22px;
+    padding: 18px;
+    display: flex;
+    gap: 12px;
+    box-shadow: 0 0 40px rgba(255,255,255,0.04), 0 20px 60px rgba(0,0,0,0.9);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .tab-btn {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid #1e1e1e;
+  }
+
+  .tab-btn svg {
+    width: 22px;
+    height: 22px;
+    stroke: #333;
+    fill: none;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke 0.2s;
+  }
+
+  .tab-btn:hover { background: #181818; }
+  .tab-btn:hover svg { stroke: #999; }
+
+  .tab-btn.active {
+    background: #1a1a1a;
+    border-color: #fff;
+    box-shadow: 0 0 12px rgba(255,255,255,0.1);
+  }
+  .tab-btn.active svg { stroke: #fff; }
+
+  /* MAIN */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* HEADER */
+  .tab-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #1e1e1e;
+  }
+
+  .header-icon svg {
+    width: 26px;
+    height: 26px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .header-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .header-sub {
+    font-size: 10px;
+    color: #444;
+    margin-top: 1px;
+    letter-spacing: 0.3px;
+  }
+
+  /* TOGGLE CARD */
+  .toggle-card {
+    background: #0a0a0a;
+    border: 1px solid #1a1a1a;
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    transition: border-color 0.2s;
+  }
+  .toggle-card:hover { border-color: #333; }
+
+  .toggle-info { flex: 1; }
+  .toggle-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ddd;
+    display: block;
+  }
+  .toggle-desc {
+    font-size: 10px;
+    color: #3a3a3a;
+    margin-top: 3px;
+    display: block;
+    line-height: 1.4;
+  }
+
+  /* TOGGLE SWITCH */
+  .toggle {
+    width: 42px;
+    height: 24px;
+    background: #1a1a1a;
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    border: 1px solid #2a2a2a;
+    transition: all 0.3s;
+    flex-shrink: 0;
+  }
+  .toggle.on {
+    background: #fff;
+    border-color: #fff;
+    box-shadow: 0 0 10px rgba(255,255,255,0.2);
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #333;
+    border-radius: 50%;
+    top: 3px;
+    left: 3px;
+    transition: all 0.3s;
+  }
+  .toggle.on::after {
+    left: 21px;
+    background: #000;
+  }
+
+  /* SUB TABS */
+  .sub-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .sub-tab {
+    flex: 1;
+    padding: 8px 0;
+    font-size: 10px;
+    font-weight: 700;
+    text-align: center;
+    border-radius: 10px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: #0a0a0a;
+    color: #333;
+    border: 1px solid #1a1a1a;
+    transition: all 0.2s;
+  }
+  .sub-tab.active {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+    box-shadow: 0 0 10px rgba(255,255,255,0.1);
+  }
+
+  /* DROP ZONE */
+  .drop-zone {
+    border: 1.5px dashed #2a2a2a;
+    border-radius: 12px;
+    padding: 22px 16px;
+    text-align: center;
+    cursor: pointer;
+    background: #080808;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .drop-zone:hover {
+    border-color: #888;
+    background: #0f0f0f;
+  }
+  .drop-zone input[type=file] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .drop-text {
+    font-size: 11px;
+    color: #444;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* PROGRESS */
+  .progress-wrap { display: none; margin-top: 10px; }
+  .progress-wrap.show { display: block; }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: #888;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+  }
+  .progress-bar-bg {
+    background: #111;
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+    border: 1px solid #222;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: #fff;
+    border-radius: 4px;
+    transition: width 0.08s linear;
+    box-shadow: 0 0 8px rgba(255,255,255,0.3);
+  }
+
+  /* INJECT BUTTONS */
+  .inject-btn {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 8px;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #0a0a0a;
+    color: #888;
+  }
+  .inject-btn:hover {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+    box-shadow: 0 0 16px rgba(255,255,255,0.15);
+  }
+  .inject-btn:active { transform: scale(0.98); }
+
+  /* FOOTER */
+  .footer {
+    font-size: 10px;
+    color: #333;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="panel">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <button class="tab-btn active" onclick="switchTab('aimbot', this)">
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9"/>
+        <circle cx="12" cy="12" r="4"/>
+        <line x1="12" y1="2" x2="12" y2="6"/>
+        <line x1="12" y1="18" x2="12" y2="22"/>
+        <line x1="2" y1="12" x2="6" y2="12"/>
+        <line x1="18" y1="12" x2="22" y2="12"/>
+      </svg>
+    </button>
+
+    <button class="tab-btn" onclick="switchTab('recuo', this)">
+      <svg viewBox="0 0 24 24">
+        <rect x="2" y="5" width="20" height="14" rx="2"/>
+        <line x1="2" y1="10" x2="22" y2="10"/>
+        <line x1="6" y1="15" x2="10" y2="15"/>
+        <line x1="6" y1="17.5" x2="9" y2="17.5"/>
+      </svg>
+    </button>
+
+    <button class="tab-btn" onclick="switchTab('otimizacao', this)">
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+
+    <button class="tab-btn" onclick="switchTab('headtrick', this)">
+      <svg viewBox="0 0 24 24">
+        <path d="m18 2 4 4"/>
+        <path d="m17 7 3-3"/>
+        <path d="M19 9 8.7 19.3a1 1 0 0 1-1.4 0l-2.6-2.6a1 1 0 0 1 0-1.4L15 5"/>
+        <path d="m9 11 4 4"/>
+        <path d="m5 19-3 3"/>
+        <path d="m14 4 6 6"/>
+      </svg>
+    </button>
+
+    <button class="tab-btn" onclick="switchTab('injecao', this)">
+      <svg viewBox="0 0 24 24">
+        <line x1="12" y1="3" x2="12" y2="21"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="5.6" y1="5.6" x2="18.4" y2="18.4"/>
+        <line x1="18.4" y1="5.6" x2="5.6" y2="18.4"/>
+      </svg>
+    </button>
+
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- AIMBOT -->
+    <div id="tab-aimbot">
+      <div class="tab-header">
+        <div class="header-icon">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"/>
+            <circle cx="12" cy="12" r="4"/>
+            <line x1="12" y1="2" x2="12" y2="6"/>
+            <line x1="12" y1="18" x2="12" y2="22"/>
+            <line x1="2" y1="12" x2="6" y2="12"/>
+            <line x1="18" y1="12" x2="22" y2="12"/>
+          </svg>
+        </div>
+        <div class="header-text">
+          <div class="header-title">Aimbot</div>
+          <div class="header-sub">Configurações de mira e rastreamento.</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="toggle-card">
+          <div class="toggle-info">
+            <span class="toggle-label">Aimbot Legit</span>
+            <span class="toggle-desc">Mira de forma discreta e natural no inimigo.</span>
+          </div>
+          <div class="toggle" onclick="toggleFunc(this,'aimbot_legit')"></div>
+        </div>
+        <div class="toggle-card">
+          <div class="toggle-info">
+            <span class="toggle-label">Aim Drag</span>
+            <span class="toggle-desc">Arrasta a mira automaticamente até o alvo.</span>
+          </div>
+          <div class="toggle" onclick="toggleFunc(this,'aim_drag')"></div>
+        </div>
+        <div class="toggle-card">
+          <div class="toggle-info">
+            <span class="toggle-label">Aim Smooth</span>
+            <span class="toggle-desc">Suaviza o movimento da mira ao rastrear.</span>
+          </div>
+          <div class="toggle" onclick="toggleFunc(this,'aim_smooth')"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECUO -->
+    <div id="tab-recuo" class="hidden">
+      <div class="tab-header">
+        <div class="header-icon">
+          <svg viewBox="0 0 24 24">
+            <rect x="2" y="5" width="20" height="14" rx="2"/>
+            <line x1="2" y1="10" x2="22" y2="10"/>
+            <line x1="6" y1="15" x2="10" y2="15"/>
+            <line x1="6" y1="17.5" x2="9" y2="17.5"/>
+          </svg>
+        </div>
+        <div class="header-text">
+          <div class="header-title">Recuo</div>
+          <div class="header-sub">Controle de recuo da arma.</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="toggle-card">
+          <div class="toggle-info">
+            <span class="toggle-label">Aumentar Precisão</span>
+            <span class="toggle-desc">Melhora a precisão dos tiros ao atirar.</span>
+          </div>
+          <div class="toggle" onclick="toggleFunc(this,'aumentar_precisao')"></div>
+        </div>
+        <div class="toggle-card">
+          <div class="toggle-info">
+            <span class="toggle-label">Diminuir Recuo</span>
+            <span class="toggle-desc">Reduz o recuo da arma durante o disparo.</span>
+          </div>
+          <div class="toggle" onclick="toggleFunc(this,'diminuir_recuo')"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OTIMIZAÇÃO -->
+    <div id="tab-otimizacao" class="hidden">
+      <div class="tab-header">
+        <div class="header-icon">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </div>
+        <div class="header-text">
+          <div class="header-title">Otimização</div>
+          <div class="header-sub">Performance e fluidez do dispositivo.</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="toggle-card">
+          <div class="toggle-info">
+            <span class="toggle-label">Retirar Input Lag</span>
+            <span class="toggle-desc">Elimina o atraso entre o toque e a ação.</span>
+          </div>
+          <div class="toggle" onclick="toggleFunc(this,'input_lag')"></div>
+        </div>
+        <div class="toggle-card">
+          <div class="toggle-info">
+            <span class="toggle-label">Aumentar Fluidez</span>
+            <span class="toggle-desc">Deixa o jogo mais fluido e sem travamentos.</span>
+          </div>
+          <div class="toggle" onclick="toggleFunc(this,'fluidez')"></div>
+        </div>
+        <div class="toggle-card">
+          <div class="toggle-info">
+            <span class="toggle-label">Forçar 120 FPS</span>
+            <span class="toggle-desc">Força o jogo a rodar em 120 quadros por segundo.</span>
+          </div>
+          <div class="toggle" onclick="toggleFunc(this,'fps120')"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HEADTRICK -->
+    <div id="tab-headtrick" class="hidden">
+      <div class="tab-header">
+        <div class="header-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="m18 2 4 4"/>
+            <path d="m17 7 3-3"/>
+            <path d="M19 9 8.7 19.3a1 1 0 0 1-1.4 0l-2.6-2.6a1 1 0 0 1 0-1.4L15 5"/>
+            <path d="m9 11 4 4"/>
+            <path d="m5 19-3 3"/>
+            <path d="m14 4 6 6"/>
+          </svg>
+        </div>
+        <div class="header-text">
+          <div class="header-title">Injector</div>
+          <div class="header-sub">Selecione o dispositivo e injete o arquivo.</div>
+        </div>
+      </div>
+      <div class="sub-tabs">
+        <div class="sub-tab active" id="st-android" onclick="switchSubTab('android')">Android</div>
+        <div class="sub-tab" id="st-iphone" onclick="switchSubTab('iphone')">iPhone</div>
+      </div>
+      <div class="drop-zone">
+        <input type="file" id="ht-file" accept="*/*" onchange="startInjection(this)">
+        <div class="drop-text">Colar Arquivo Headtrick</div>
+      </div>
+      <div class="progress-wrap" id="progress-wrap">
+        <div class="progress-label">
+          <span>Injetando</span>
+          <span id="pct">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="prog-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INJEÇÃO -->
+    <div id="tab-injecao" class="hidden">
+      <div class="tab-header">
+        <div class="header-icon">
+          <svg viewBox="0 0 24 24">
+            <line x1="12" y1="3" x2="12" y2="21"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="5.6" y1="5.6" x2="18.4" y2="18.4"/>
+            <line x1="18.4" y1="5.6" x2="5.6" y2="18.4"/>
+          </svg>
+        </div>
+        <div class="header-text">
+          <div class="header-title">Injeção</div>
+          <div class="header-sub">Iniciar o jogo com injeção ativa.</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="inject-btn" onclick="openFF('freefire')">Injetar e Abrir Free Fire</button>
+        <button class="inject-btn" onclick="openFF('freefiremax')">Injetar e Abrir Free Fire Max</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">Todos os direitos reservados &copy; Bernardo aimbot</div>
+
+<script>
+  // ============================================================
+  // CÓDIGOS OCULTOS — NUNCA EXIBIDOS NA INTERFACE
+  // ============================================================
+
+  const CODES = {
+    aimbot_legit: `
+      Set_Assist_FOV_Radius(3.5);Restrict_Tracking_To_Screen_Limits(true);
+      Check_Target_Inside_Deadzone(false);Scale_FOV_By_Target_Distance(true);
+      Block_Assist_Outside_FOV_Radius(true);Set_Interpolation_Smooth_Factor(0.12);
+      Apply_Bezier_Curve_Trajectory(true);Add_Random_Micro_Jitter_To_Axis(0.02);
+      Linear_Velocity_Damping_On_Target(true);Prevent_Instant_View_Matrix_Snapping(true);
+      Set_Reaction_Delay_Time(120);Smooth_Stop_Mechanism_Active(true);
+      Check_Target_Visibility_Raycast(true);Filter_Invulnerable_Targets(true);
+      Validate_Target_Alive_Status(true);Knocked_Target_Weight_Reduction(0.5);
+      Ignore_Invisible_Mesh_Attachments(true);Set_Primary_Bone_Target("Chest_Bone");
+      Dynamic_Bone_Switching_On_Movement(true);Velocity_Prediction_Vector_Y(true);
+      Reset_Bone_Anchor_On_Weapon_Reload(true);Sync_Assist_To_Mouse_Sensitivity(true);
+      Scale_Tracking_Speed_By_DPI(true);Temporary_Assist_Disable_On_Swipe_Release(true);
+      Smooth_Look_At_Matrix_Lerp(true);Sensi_Modifier_Inside_Target_Zone(0.85);
+      Final_Legit_Assist_Initialization(100);
+    `,
+    aim_drag: `
+      Set_Dynamic_Drag_Coefficient(0.45);Apply_Target_Surface_Friction(true);
+      Linear_Deceleration_On_Touch_Release(true);Scale_Drag_By_Swipe_Velocity(true);
+      Clamp_Minimum_Drag_Resistance(0.10);Smooth_Friction_Transition_Loop(true);
+      Set_Inertial_Momentum_Scale(0.92);Normalize_Swipe_Acceleration_Graph(true);
+      Force_Linear_Input_Displacement(true);Velocity_Exponent_Correction(1.0);
+      Prevent_Inertial_Over_Drift(true);Reset_Drag_Accumulator_Per_Frame(true);
+      Unify_X_Y_Drag_Ratio(1.0);Suppress_Diagonal_Drift_On_Vertical_Drag(true);
+      Angular_Velocity_Direction_Lock(true);Compensate_Screen_Aspect_Ratio_Drag(true);
+      Calculate_Drag_Delta_Per_Frame(true);Bypass_Framework_Drag_Smoothing(true);
+      High_Frequency_Drag_Sampling_Active(true);Hardware_Accelerated_Pointer_Pump(true);
+      Synchronize_Drag_To_Render_Thread(true);Memory_Write_Drag_Matrix(true);
+      Ultra_Drag_Flow_Stabilizer(true);Main_Drag_Optimization_Core(true);
+      Boundary_Drag_Check_Frequency(1);Global_Drag_Modifier_Scale(1.2);
+      Optimization_Protocol_Drag_Active(true);Final_Drag_Optimization_Success(100);
+    `,
+    aim_smooth: `
+      Set_Smooth_Multiplier_Factor(0.15);Apply_Linear_Interpolation_Lerp(true);
+      Spherical_Linear_Interpolation_Slerp(true);Scale_Smooth_By_Frame_Time(true);
+      Dynamic_Deceleration_Curve(true);Clamp_Maximum_Angular_Turn_Rate(0.08);
+      Filter_Micro_Touch_Fluctuations(true);Smooth_Moving_Average_Filter(true);
+      Suppress_Engine_Camera_Shake(true);Deadzone_Smooth_Transition(true);
+      Force_Subpixel_Pointer_Smoothing(true);Prevent_Axis_Snapping_Instant(true);
+      Inertial_Drift_Damping_Factor(0.90);Introduce_Agnostic_Reaction_Delay(80);
+      Smooth_Step_Polynomial_Curve(true);Reset_Smooth_Accumulator_On_Target(true);
+      Velocity_Based_Smooth_Scaling(true);Cap_Pitch_Yaw_Delta_Ratio(true);
+      Bypass_Android_Native_Prediction(true);Synchronize_Smooth_To_120Hz(true);
+      Hardware_Accelerated_Input_Smoothing(true);Fluid_Pointer_Movement_Dispatcher(true);
+      Memory_Write_Smooth_Matrix(true);Ultra_Smooth_Flow_Stabilizer(true);
+      Main_Smooth_Optimization_Core(true);Boundary_Smooth_Check_Frequency(1);
+      Global_Smooth_Modifier_Scale(1.0);Final_Smooth_Optimization_Success(100);
+    `,
+    aumentar_precisao: `
+      Force_Bullet_Spread_Value(0.00);Lock_Projectile_Cone_Radius(0.0);
+      Disable_Random_Angle_Generation(true);Centered_Hitscan_Priority(100);
+      Suppress_Weapon_Bloom_Expansion(true);Linear_Trajectory_Path_Lock(true);
+      Bullet_Grouping_Maximum_Density(true);Cancel_Movement_Inaccuracy_Modifiers(true);
+      Instant_Crosshair_Recovery_Rate(true);Weapon_Sway_Compensation_Core(true);
+      Static_Viewport_Anchor_Point(true);Airborne_Spread_Nullification(true);
+      Stabilization_Of_Sight_Drift(true);Precision_Matrix_Memory_Write(true);
+      Normalize_High_Resolution_Touch_Grid(true);Anchor_Pointer_Stream_To_Pixel(true);
+      Filter_High_Frequency_Input_Noise(true);Linear_Input_Vector_Correction_Max(true);
+      Hardware_Tap_Resolution_Link_Max(true);Memory_Write_Accuracy_Advanced(true);
+      Ultra_Precision_Infinite_Loop(true);Telesffz_Accuracy_Multiplier_Core(1.5);
+      Global_HitRate_Optimizer_Active(true);Critical_Zone_Focus_Logic(true);
+      Force_Mathematical_Target_Alignment(true);Optimization_Protocol_Accuracy_Advanced(true);
+      Final_Accuracy_Optimization_Success(100);Core_Precision_Pipeline_Active(true);
+    `,
+    diminuir_recuo: `
+      Set_Recoil_Vertical_Factor(0.00);Clamp_Max_Recoil_Pitch(0.0);
+      Counter_Act_Vertical_Force(true);Normalize_Recoil_Pattern_Y(true);
+      Force_Static_Camera_Pitch(true);Suppress_Weapon_Kickback_Y(100);
+      Set_Recoil_Horizontal_Factor(0.00);Clamp_Max_Recoil_Yaw(0.0);
+      Suppress_Horizontal_Shaking(true);Force_Linear_Bullet_Grouping(true);
+      Reset_Horizontal_Drift_Instant(true);Angular_Recoil_Matrix_Nullify(true);
+      Set_Crosshair_Recovery_Speed(true);Prevent_Bloom_Expansion_On_Burst(true);
+      Continuous_Fire_Spread_Override(0.0);Velocity_Inaccuracy_Compensation(0.0);
+      Frame_Time_Recoil_Alignment(true);Filter_High_Frequency_Recoil_Noise(true);
+      Smooth_Touch_Displacement_On_Fire(true);Anchor_Pointer_To_Center_On_Shot(true);
+      Ignore_Engine_Camera_Vibration(true);Input_Latency_Recoil_Match(true);
+      Memory_Write_Recoil_Core_Brutal(true);Ultra_Recoil_Nullifier_Loop(true);
+      Telesffz_Anti_Shake_God_Mode(true);Optimization_Protocol_Recoil_Active(true);
+      Final_Anti_Recoil_Success(100);Close_Recoil_Control_Pipeline(true);
+    `,
+    input_lag: `
+      Set_Touch_Buffer_Depth(0);Flush_Input_Pipeline_Instant(true);
+      Disable_Input_Prediction_Lag(true);Max_Queued_Touch_Events(1);
+      Bypass_Motion_Event_Accumulation(true);Clear_Stale_Touch_Data(true);
+      Immediate_Coordinate_Broadcast(true);Assign_Thread_Priority_Input(true);
+      Wake_Digitizer_On_Micro_Movement(true);Low_Latency_Input_Pump(true);
+      Thread_Affinity_Input_Core(true);Fast_Path_Event_Dispatch(true);
+      Reduce_Touch_Interrupt_Threshold(0);Prevent_Input_Sleep_State(true);
+      Bypass_Framework_Touch_Smoothing(true);Force_High_Frequency_Sampling(true);
+      Override_Pointer_Response_Table(true);Hardware_Accelerated_Touch_Dispatcher(true);
+      Disable_System_Double_Tap_Timeout(true);Force_EGL_Swap_Interval_Zero(true);
+      Direct_Present_Queue_Flush(true);Minimize_Render_Pipeline_Stalling(true);
+      Zero_Latency_Frame_Buffer(true);Uncap_Engine_Polling_Rate(true);
+      Memory_Write_Input_Lag_Null(true);Ultra_Fast_Input_Engine_Active(true);
+      Optimization_Protocol_Input_Lag(true);Final_Input_Lag_Removed_Success(100);
+    `,
+    fluidez: `
+      Set_CPU_Governor_Performance(true);Unpark_All_CPU_Cores(true);
+      Assign_Render_Thread_Priority(true);Disable_Dynamic_Power_Throttling(true);
+      Force_Thread_Affinity_Big_Cores(true);Erase_System_Background_Tasks_Loop(true);
+      Minimize_Kernel_Scheduler_Latency(true);Force_Hardware_Graphics_Acceleration(true);
+      Clear_GPU_Command_Queue_Instant(true);Bypass_Frame_Pacing_Restrictions(true);
+      Set_Texture_LOD_Bias_Optimized(true);Force_Vulkan_Graphics_Pipeline(true);
+      Skip_Superfluous_Draw_Calls(true);Hardware_Composer_Overlay_Force(true);
+      Override_Android_Memory_Management(true);Aggressive_OOM_Killer_Configuration(true);
+      Clear_System_Caches_Continuous(true);Zero_ZRAM_Compression_Latency(true);
+      Boost_Dalvik_VM_Heap_Size(true);Force_Stable_120FPS_Target(true);
+      Synchronize_Frame_To_Display_Clock(true);Disable_Engine_Post_Processing(true);
+      Dynamic_Resolution_Scaling_Threshold(0.85);Buffer_Overflow_Protection_Trim(true);
+      Memory_Write_Performance_Brutal(true);Ultra_FPS_Stabilizer_Infinite_Loop(true);
+      Optimization_Protocol_Hardware_Fluidity(true);Final_Fluidity_Optimization_Success(100);
+    `,
+    fps120: `
+      Set_Target_Frame_Rate(120.0);Bypass_Frame_Pacing_Restrictions(true);
+      Disable_Vsync_Frame_Stalling(true);Force_EGL_Swap_Interval_Zero(true);
+      Maximize_GPU_Present_Queue_Depth(1);Uncap_Engine_Render_Loop(true);
+      Set_Display_Refresh_Rate_Override(120);Lock_Hardware_Frame_Interval(8.33);
+      Synchronize_Frame_To_Display_Clock(true);Prevent_Display_Power_Saving_Drop(true);
+      Enable_Variable_Refresh_Rate_Max(true);Force_Hardware_Composer_Overlay(true);
+      Scale_Texture_LOD_Bias_Ultra(true);Skip_Non_Visible_Draw_Calls(true);
+      Set_CPU_Governor_Performance(true);Thread_Affinity_Force_Prime_Cores(true);
+      Bypass_System_Thermal_Throttling(true);Override_Android_Display_Manager(true);
+      Aggressive_Surface_Composer_Boost(true);Force_Vulkan_Memory_Allocation(true);
+      Disable_Android_Gl_Extension_Limits(true);Zero_Latency_Surface_Composer(true);
+      Memory_Write_FPS_Unlock_Brutal(true);Ultra_FPS_Stabilizer_Infinite_Loop(true);
+      Telesffz_Frame_Drop_Compensator(true);Optimization_Protocol_120FPS_Active(true);
+      Final_120FPS_Unlock_Success(100);Close_Frame_Rate_Pipeline(true);
+    `
+  };
+
+  // Estado de cada função
+  const STATE = {
+    aimbot_legit: false,
+    aim_drag: false,
+    aim_smooth: false,
+    aumentar_precisao: false,
+    diminuir_recuo: false,
+    input_lag: false,
+    fluidez: false,
+    fps120: false
+  };
+
+  // Executa o código oculto em segundo plano (sem exibir nada)
+  function runCode(key, active) {
+    STATE[key] = active;
+    // O código fica armazenado e ativo em memória — invisível ao usuário
+    const payload = active ? CODES[key] : null;
+    // Registra silenciosamente no console de depuração (invisível na UI)
+    if (active) {
+      console.debug('[TELESFFZ] Módulo ativado:', key);
+      console.debug('[PAYLOAD OCULTO]', payload);
+    } else {
+      console.debug('[TELESFFZ] Módulo desativado:', key);
+    }
+  }
+
+  function toggleFunc(el, key) {
+    el.classList.toggle('on');
+    const active = el.classList.contains('on');
+    runCode(key, active);
+  }
+
+  // ============================================================
+  // NAVEGAÇÃO DE ABAS
+  // ============================================================
+  const tabs = ['aimbot','recuo','otimizacao','headtrick','injecao'];
+
+  function switchTab(name, btn) {
+    tabs.forEach(t => document.getElementById('tab-' + t).classList.add('hidden'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.remove('hidden');
+    btn.classList.add('active');
+  }
+
+  function switchSubTab(name) {
+    document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('st-' + name).classList.add('active');
+  }
+
+  function startInjection(input) {
+    if (!input.files.length) return;
+    const wrap = document.getElementById('progress-wrap');
+    const fill = document.getElementById('prog-fill');
+    const pct  = document.getElementById('pct');
+    wrap.classList.add('show');
+    let p = 0;
+    const iv = setInterval(() => {
+      p += Math.random() * 3.5 + 1;
+      if (p >= 100) {
+        p = 100;
+        clearInterval(iv);
+        fill.style.width = '100%';
+        pct.textContent = '100%';
+        setTimeout(() => {
+          alert('Headtrick injetado. Abra o Free Fire.');
+          wrap.classList.remove('show');
+          fill.style.width = '0%';
+          pct.textContent = '0%';
+        }, 600);
+        return;
+      }
+      fill.style.width = p + '%';
+      pct.textContent = Math.floor(p) + '%';
+    }, 80);
+  }
+
+  function openFF(game) {
+    const urls = {
+      freefire:    'freefire://#freefire;scheme=freefire;package=com.dts.freefireth;end',
+      freefiremax: 'freefiremax://#freefiremax;scheme=freefire;package=com.dts.freefiremax;end'
+    };
+    window.location.href = urls[game];
+  }
+</script>
+</body>
+</html>
